@@ -290,7 +290,13 @@ class GFNoCaptchaReCaptcha_Public {
                 $recaptcha_response = urlencode( $_POST['g-recaptcha-response'] );
                 $user_ip            = $_SERVER['REMOTE_ADDR'];
                 $verify_url         = $this->sanitize_url( 'https://www.google.com/recaptcha/api/siteverify?secret=' . $this->google_private_key . '&response=' . $recaptcha_response . '&remoteip=' . $user_ip );
-                $json_response      = file_get_contents( $verify_url );
+                
+                $json_response = null;
+                $response = wp_remote_get( $verify_url );
+
+                if( is_array( $response ) && !is_wp_error( $response ) ) {
+                    $json_response = $response['body'];
+                }
 
                 if( ! empty( $json_response ) && $result = json_decode( $json_response, true ) ) {
 
